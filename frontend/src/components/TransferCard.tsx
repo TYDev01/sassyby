@@ -34,7 +34,7 @@ const TOKENS: SendToken[] = ["STX", "USDCx", "BTC"];
 function TokenDot({ token }: { token: SendToken }) {
   return (
     <span
-      className="w-4 h-4 rounded-full shrink-0 transition-colors duration-300"
+      className="w-5 h-5 rounded-full shrink-0 transition-colors duration-300"
       style={{ backgroundColor: TOKEN_COLORS[token] }}
     />
   );
@@ -71,12 +71,12 @@ function TokenDropdown({
         aria-expanded={open}
         className="
           flex items-center gap-2 bg-[#1a1a1a] border border-white/10
-          rounded-full px-3 py-1.5 focus:outline-none
+          rounded-full px-4 py-2 focus:outline-none
           hover:border-white/20 transition-colors duration-200
         "
       >
         <TokenDot token={selected} />
-        <span className="text-white text-sm font-semibold tracking-wide">
+        <span className="text-white text-base font-semibold tracking-wide">
           {selected}
         </span>
         <ChevronDown
@@ -112,7 +112,7 @@ function TokenDropdown({
                     setOpen(false);
                   }}
                   className={`
-                    w-full flex items-center gap-2 px-3 py-2 text-sm
+                    w-full flex items-center gap-2 px-4 py-2.5 text-sm
                     transition-colors duration-150
                     ${
                       t === selected
@@ -164,7 +164,7 @@ function AmountInput({
       onChange={handleChange}
       aria-label={`Amount to send in ${token}`}
       className="
-        bg-transparent text-gray-500 text-2xl font-light
+        bg-transparent text-gray-500 text-3xl font-light
         placeholder:text-gray-600 w-full focus:outline-none
         focus:text-white transition-colors duration-200
         caret-[#f97316]
@@ -188,7 +188,7 @@ function USDLabel({ amount }: { amount: number }) {
       initial={{ opacity: 0, y: 4 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
-      className="text-gray-500 text-sm mt-1"
+      className="text-gray-500 text-base mt-1"
     >
       {formatted}
     </motion.p>
@@ -211,7 +211,7 @@ export default function TransferCard({
       transition={{ duration: 0.45, ease: "easeOut" }}
       className="
         w-full bg-[#111111] border border-white/[0.07]
-        rounded-2xl px-5 py-4 flex flex-col gap-1
+        rounded-2xl px-6 py-5 flex flex-col gap-1
       "
     >
       {/* Header row */}

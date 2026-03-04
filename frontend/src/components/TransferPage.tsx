@@ -73,9 +73,9 @@ function HeroHeading() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.55, ease: "easeOut" }}
-      className="text-center mb-8"
+      className="text-center mb-10"
     >
-      <h1 className="text-4xl font-bold text-white leading-tight tracking-tight">
+      <h1 className="text-5xl font-bold text-white leading-tight tracking-tight">
         Bridge between Crypto
         <br />
         and local bank accounts
@@ -97,7 +97,7 @@ function SwapButton({ onClick }: { onClick: () => void }) {
         onClick={onClick}
         aria-label="Swap transfer direction"
         className="
-          w-9 h-9 rounded-full
+          w-11 h-11 rounded-full
           bg-[#1a1a1a] border border-white/15
           flex items-center justify-center
           text-gray-400 hover:text-white
@@ -123,7 +123,7 @@ function QuickTransferBanner() {
       className="flex items-center justify-center gap-1.5 py-1"
     >
       <Zap size={12} className="text-[#f97316] shrink-0" />
-      <p className="text-xs text-gray-400 text-center">
+      <p className="text-sm text-gray-400 text-center">
         Quick transfers up to{" "}
         <span className="text-[#f97316] font-medium">$10,000</span>{" "}
         - no signup required!
@@ -155,7 +155,7 @@ function SubmitButton({
       disabled={disabled}
       aria-disabled={disabled}
       className={`
-        w-full rounded-xl px-4 py-3.5 text-sm font-semibold
+        w-full rounded-xl px-4 py-4 text-base font-semibold
         transition-all duration-300 focus:outline-none
         ${
           disabled
@@ -247,12 +247,12 @@ export default function TransferPage() {
       <Navbar />
 
       {/* Main content */}
-      <main className="flex-1 flex flex-col items-center px-4 pt-16 pb-20">
+      <main className="flex-1 flex flex-col items-center px-4 pt-20 pb-24">
         {/* Hero */}
         <HeroHeading />
 
         {/* Card stack */}
-        <div className="w-full max-w-[520px] flex flex-col gap-0">
+        <div className="w-full max-w-[600px] flex flex-col gap-0">
           {/* Send / Receive cards with swap */}
           <div className="flex flex-col gap-0">
             <motion.div
@@ -284,7 +284,7 @@ export default function TransferPage() {
           </div>
 
           {/* Spacer */}
-          <div className="h-3" />
+          <div className="h-4" />
 
           {/* Bank + account number row */}
           <BankSelector
@@ -295,7 +295,7 @@ export default function TransferPage() {
           />
 
           {/* Spacer */}
-          <div className="h-3" />
+          <div className="h-4" />
 
           {/* Payment method */}
           <PaymentMethodSelector

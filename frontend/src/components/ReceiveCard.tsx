@@ -32,7 +32,7 @@ const CURRENCIES: Currency[] = ["NGN", "GHS", "KES"];
 function CurrencyDot({ currency }: { currency: Currency }) {
   return (
     <span
-      className="w-4 h-4 rounded-full shrink-0 transition-colors duration-300"
+      className="w-5 h-5 rounded-full shrink-0 transition-colors duration-300"
       style={{ backgroundColor: CURRENCY_COLORS[currency] }}
     />
   );
@@ -71,12 +71,12 @@ function CurrencyDropdown({
         aria-expanded={open}
         className="
           flex items-center gap-2 bg-[#1a1a1a] border border-white/10
-          rounded-full px-3 py-1.5 focus:outline-none
+          rounded-full px-4 py-2 focus:outline-none
           hover:border-white/20 transition-colors duration-200
         "
       >
         <CurrencyDot currency={selected} />
-        <span className="text-white text-sm font-semibold tracking-wide">
+        <span className="text-white text-base font-semibold tracking-wide">
           {selected}
         </span>
         <ChevronDown
@@ -113,7 +113,7 @@ function CurrencyDropdown({
                     setOpen(false);
                   }}
                   className={`
-                    w-full flex items-center gap-2 px-3 py-2 text-sm
+                    w-full flex items-center gap-2 px-4 py-2.5 text-sm
                     transition-colors duration-150
                     ${
                       c === selected
@@ -145,7 +145,7 @@ function AmountDisplay({ amount }: { amount: number }) {
       initial={{ opacity: 0.4, y: 4 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25 }}
-      className="text-white text-2xl font-light"
+      className="text-white text-3xl font-light"
     >
       {formatted}
     </motion.p>
@@ -162,7 +162,7 @@ function MinimumLabel({
   currency: Currency;
 }) {
   return (
-    <p className="text-gray-500 text-sm mt-1">
+    <p className="text-gray-500 text-base mt-1">
       Min:{" "}
       <span className="text-gray-400">
         {minimum.toFixed(2)} {currency}
@@ -186,11 +186,11 @@ export default function ReceiveCard({
       transition={{ duration: 0.45, ease: "easeOut", delay: 0.1 }}
       className="
         w-full bg-[#111111] border border-white/[0.07]
-        rounded-2xl px-5 py-4
+        rounded-2xl px-6 py-5
       "
     >
       {/* Header */}
-      <p className="text-gray-400 text-xs font-medium uppercase tracking-widest mb-2">
+      <p className="text-gray-400 text-xs font-medium uppercase tracking-widest mb-3">
         You&apos;ll receive
       </p>
 
