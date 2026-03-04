@@ -26,14 +26,12 @@ const FEE_RATES: Record<PaymentMethodId, number> = {
 
 /** Minimum receive amount per currency (USD-denominated base) */
 const MIN_RECEIVE: Record<string, number> = {
-  USD: 1.0,
-  EUR: 0.92,
-  GBP: 0.79,
   NGN: 1550,
+  GHS: 14,
   KES: 132,
 };
 
-type Currency = "USD" | "EUR" | "GBP" | "NGN" | "KES";
+type Currency = "NGN" | "GHS" | "KES";
 
 // ─── Available Balance ─────────────────────────────────────────────────────────
 
@@ -177,7 +175,7 @@ function SubmitButton({
 export default function TransferPage() {
   // ── Form state ──────────────────────────────────────────────────────────────
   const [sendAmount, setSendAmount] = useState("");
-  const [currency, setCurrency] = useState<Currency>("USD");
+  const [currency, setCurrency] = useState<Currency>("NGN");
   const [selectedBank, setSelectedBank] = useState<Bank | null>(null);
   const [accountNumber, setAccountNumber] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethodId | null>(null);
@@ -262,7 +260,7 @@ export default function TransferPage() {
 
             <motion.div
               animate={{ order: swapped ? 0 : 2 }}
-              className="z-0"
+              className="relative z-10"
             >
               <ReceiveCard
                 amount={receiveAmount}
