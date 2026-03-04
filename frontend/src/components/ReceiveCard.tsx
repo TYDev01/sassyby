@@ -6,7 +6,7 @@ import { useState, useRef, useEffect } from "react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type Currency = "USD" | "EUR" | "GBP" | "NGN" | "KES";
+type Currency = "NGN" | "GHS" | "KES";
 
 interface ReceiveCardProps {
   /** Calculated receive amount (controlled by parent) */
@@ -20,14 +20,12 @@ interface ReceiveCardProps {
 }
 
 const CURRENCY_COLORS: Record<Currency, string> = {
-  USD: "#06b6d4", // teal
-  EUR: "#3b82f6", // blue
-  GBP: "#8b5cf6", // violet
   NGN: "#22c55e", // green
-  KES: "#f59e0b", // amber
+  GHS: "#f59e0b", // amber
+  KES: "#8b5cf6", // violet
 };
 
-const CURRENCIES: Currency[] = ["USD", "EUR", "GBP", "NGN", "KES"];
+const CURRENCIES: Currency[] = ["NGN", "GHS", "KES"];
 
 // ─── Currency Dot ─────────────────────────────────────────────────────────────
 
