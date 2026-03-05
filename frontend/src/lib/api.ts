@@ -84,6 +84,8 @@ export interface RateQuote {
   flwRate: number;
   receiveAmount: number;
   currency: string;
+  rateSource?: "flutterwave" | "fallback" | "manual";
+  rateMode?: "api" | "manual";
 }
 
 export async function fetchRates(
@@ -96,6 +98,31 @@ export async function fetchRates(
   const data = await res.json();
   if (!res.ok) throw new Error(data.error ?? "Failed to fetch rates");
   return data as RateQuote;
+}
+
+// ─── Rate config (admin) ──────────────────────────────────────────────────────
+
+export type RateMode = "api" | "manual";
+
+export interface RateConfig {
+  modes: Record<string, RateMode>;
+  manualRates: Record<string, number>;
+}
+
+export async function fetchRateConfig(): Promise<RateConfig> {
+  const res = await fetch(`${BASE_URL}/api/rates/config`, { cache: "no-store" });
+  if (!res.ok) throw new Error("Failed to fetch rate config");
+  return res.json();
+}
+
+export async function updateRateConfig(patch: Partial<RateConfig>): Promise<RateConfig> {
+  const res = await fetch(`${BASE_URL}/api/rates/config`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(patch),
+  });
+  if (!res.ok) throw new Error("Failed to update rate config");
+  return res.json();
 }
 
 // ─── Flutterwave helpers ──────────────────────────────────────────────────────

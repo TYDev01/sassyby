@@ -148,7 +148,10 @@ function AmountDisplay({ amount, isLoading }: { amount: number; isLoading?: bool
   if (isLoading) {
     return <div className="h-9 w-36 rounded-lg bg-white/5 animate-pulse" />;
   }
-  const formatted = amount.toFixed(2);
+  const formatted = amount.toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
   return (
     <motion.p
       key={formatted}
