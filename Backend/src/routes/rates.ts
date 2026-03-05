@@ -67,12 +67,59 @@ async function getAccessToken(): Promise<string> {
 
 const FALLBACK_RATES: Record<string, number> = { NGN: 1580, GHS: 13.5, KES: 130 };
 
+// ─── Admin rate config (in-memory, persists while server runs) ───────────────
+
+export type RateMode = "api" | "manual";
+
+export interface RateConfig {
+  /** Per-currency mode. Defaults to "api" for any currency not listed. */
+  modes: Record<string, RateMode>;
+  /** Admin-set manual rates (USD → fiat). Only used when mode is "manual". */
+  manualRates: Record<string, number>;
+}
+
+const rateConfig: RateConfig = {
+  modes: { NGN: "api", GHS: "api", KES: "api" },
+  manualRates: { NGN: 1580, GHS: 13.5, KES: 130 },
+};
+
+// GET /api/rates/config
+router.get("/config", (_req, res: ExpressResponse) => {
+  return res.json(rateConfig);
+});
+
+// POST /api/rates/config
+router.post("/config", (req, res: ExpressResponse) => {
+  const { modes, manualRates } = req.body as Partial<RateConfig>;
+  if (modes) {
+    for (const [cur, mode] of Object.entries(modes)) {
+      if (mode === "api" || mode === "manual") rateConfig.modes[cur] = mode;
+    }
+  }
+  if (manualRates) {
+    for (const [cur, rate] of Object.entries(manualRates)) {
+      const n = Number(rate);
+      if (n > 0) rateConfig.manualRates[cur] = n;
+    }
+  }
+  // Bust the FLW rate cache for updated currencies so the new config takes effect
+  const changed = Object.keys({ ...modes, ...manualRates });
+  for (const cur of changed) delete flwRateCache[`USD→${cur}`];
+  return res.json(rateConfig);
+});
+
 // ─── Flutterwave rate cache (5-min TTL) ──────────────────────────────────────
 
 interface FlwRateEntry { rate: number; expiresAt: number; isFallback: boolean; }
 const flwRateCache: Record<string, FlwRateEntry> = {};
 
 async function getFlwRate(destCurrency: string): Promise<{ rate: number; isFallback: boolean }> {
+  // ── Admin manual override ──────────────────────────────────────────────────
+  if ((rateConfig.modes[destCurrency] ?? "api") === "manual") {
+    const manual = rateConfig.manualRates[destCurrency];
+    if (manual && manual > 0) return { rate: manual, isFallback: false };
+  }
+
   const cacheKey = `USD→${destCurrency}`;
   const cached = flwRateCache[cacheKey];
   if (cached && Date.now() < cached.expiresAt) return { rate: cached.rate, isFallback: cached.isFallback };
@@ -108,7 +155,8 @@ export interface RateQuoteResponse {
   flwRate: number;
   receiveAmount: number;
   currency: string;
-  rateSource: "flutterwave" | "fallback";
+  rateSource: "flutterwave" | "fallback" | "manual";
+  rateMode: RateMode;
 }
 
 router.get("/", async (req: Request, res: ExpressResponse) => {
@@ -132,9 +180,11 @@ router.get("/", async (req: Request, res: ExpressResponse) => {
     const usdAmount = parsedAmount * tokenPriceUSD;
     const receiveAmount = usdAmount * flwRate;
 
+    const mode = rateConfig.modes[currency] ?? "api";
     return res.json({
       token, tokenPriceUSD, usdAmount, flwRate, receiveAmount, currency,
-      rateSource: isFallback ? "fallback" : "flutterwave",
+      rateSource: mode === "manual" ? "manual" : isFallback ? "fallback" : "flutterwave",
+      rateMode: mode,
     } satisfies RateQuoteResponse);
   } catch (err) {
     console.error("[RATES]", err);

@@ -16,6 +16,9 @@ import {
   ShieldAlert,
   Wallet,
   Loader2,
+  Sliders,
+  Wifi,
+  WifiOff,
 } from "lucide-react";
 import {
   BarChart,
@@ -31,7 +34,7 @@ import {
 } from "recharts";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
-import { fetchAdminStats, AdminStats, Transfer } from "@/lib/api";
+import { fetchAdminStats, AdminStats, Transfer, fetchRateConfig, updateRateConfig, RateConfig, RateMode } from "@/lib/api";
 import { useWallet } from "@/lib/wallet";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -414,6 +417,189 @@ function UnauthorisedGate() {
   );
 }
 
+// ─── Rate Manager ─────────────────────────────────────────────────────────────
+
+const RATE_CURRENCIES: Array<{ code: string; label: string; flag: string }> = [
+  { code: "NGN", label: "Nigerian Naira",   flag: "🇳🇬" },
+  { code: "GHS", label: "Ghanaian Cedi",    flag: "🇬🇭" },
+  { code: "KES", label: "Kenyan Shilling",  flag: "🇰🇪" },
+];
+
+function RateManager() {
+  const [config, setConfig] = useState<RateConfig | null>(null);
+  const [drafts, setDrafts] = useState<Record<string, string>>({});
+  const [saving, setSaving] = useState<Record<string, boolean>>({});
+  const [savedFlag, setSavedFlag] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    fetchRateConfig()
+      .then((cfg) => {
+        setConfig(cfg);
+        const d: Record<string, string> = {};
+        for (const c of RATE_CURRENCIES) d[c.code] = String(cfg.manualRates[c.code] ?? "");
+        setDrafts(d);
+      })
+      .catch(() => {});
+  }, []);
+
+  async function handleToggle(currency: string, mode: RateMode) {
+    if (!config) return;
+    setSaving((s) => ({ ...s, [currency]: true }));
+    try {
+      const updated = await updateRateConfig({ modes: { [currency]: mode } });
+      setConfig(updated);
+      toast.success(`${currency} switched to ${mode === "manual" ? "Set Rate" : "API Rate"}`);
+    } catch {
+      toast.error("Failed to update rate mode");
+    } finally {
+      setSaving((s) => ({ ...s, [currency]: false }));
+    }
+  }
+
+  async function handleSaveRate(currency: string) {
+    const value = parseFloat(drafts[currency]);
+    if (!value || value <= 0) { toast.error("Enter a valid rate"); return; }
+    setSaving((s) => ({ ...s, [currency]: true }));
+    try {
+      const updated = await updateRateConfig({
+        manualRates: { [currency]: value },
+        modes: { [currency]: "manual" },
+      });
+      setConfig(updated);
+      setSavedFlag((s) => ({ ...s, [currency]: true }));
+      setTimeout(() => setSavedFlag((s) => ({ ...s, [currency]: false })), 2000);
+      toast.success(`${currency} rate set to ${value.toLocaleString()}`);
+    } catch {
+      toast.error("Failed to save rate");
+    } finally {
+      setSaving((s) => ({ ...s, [currency]: false }));
+    }
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.45, duration: 0.45 }}
+      className="bg-[#111111] border border-white/[0.07] rounded-2xl overflow-hidden"
+    >
+      <div className="px-6 py-4 border-b border-white/[0.07] flex items-center gap-2">
+        <Sliders size={16} className="text-[#f97316]" />
+        <h2 className="text-white font-semibold text-sm">Rate Manager</h2>
+        <span className="ml-auto text-[11px] text-gray-500 font-medium uppercase tracking-wider">
+          USD → Fiat conversion rate
+        </span>
+      </div>
+
+      {!config ? (
+        <div className="px-6 py-10 flex items-center justify-center gap-2 text-gray-500 text-sm">
+          <Loader2 size={16} className="animate-spin" />
+          Loading rate config…
+        </div>
+      ) : (
+        <div className="divide-y divide-white/[0.05]">
+          {RATE_CURRENCIES.map((cur) => {
+            const mode: RateMode = config.modes[cur.code] ?? "api";
+            const isManual = mode === "manual";
+            const isSaving = saving[cur.code];
+            const isSaved  = savedFlag[cur.code];
+
+            return (
+              <div key={cur.code} className="px-6 py-5 flex flex-col sm:flex-row sm:items-center gap-4">
+                {/* Currency label */}
+                <div className="flex items-center gap-3 min-w-[160px]">
+                  <span className="text-xl">{cur.flag}</span>
+                  <div>
+                    <p className="text-white text-sm font-semibold">{cur.code}</p>
+                    <p className="text-gray-500 text-xs">{cur.label}</p>
+                  </div>
+                </div>
+
+                {/* Mode toggle */}
+                <div className="flex items-center gap-1 rounded-xl bg-[#1a1a1a] border border-white/[0.08] p-1">
+                  <button
+                    onClick={() => { if (isManual) handleToggle(cur.code, "api"); }}
+                    disabled={isSaving}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 cursor-pointer ${
+                      !isManual
+                        ? "bg-[#f97316] text-white shadow"
+                        : "text-gray-500 hover:text-gray-300"
+                    } disabled:opacity-50`}
+                  >
+                    <Wifi size={12} />
+                    API Rate
+                  </button>
+                  <button
+                    onClick={() => { if (!isManual) handleToggle(cur.code, "manual"); }}
+                    disabled={isSaving}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 cursor-pointer ${
+                      isManual
+                        ? "bg-[#6366f1] text-white shadow"
+                        : "text-gray-500 hover:text-gray-300"
+                    } disabled:opacity-50`}
+                  >
+                    <WifiOff size={12} />
+                    Set Rate
+                  </button>
+                </div>
+
+                {/* Rate input */}
+                <div className="flex items-center gap-2 flex-1">
+                  <div className="relative flex-1 max-w-[200px]">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs font-medium pointer-events-none">
+                      1 USD =
+                    </span>
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={drafts[cur.code] ?? ""}
+                      onChange={(e) =>
+                        setDrafts((d) => ({ ...d, [cur.code]: e.target.value }))
+                      }
+                      placeholder={String(config.manualRates[cur.code] ?? "")}
+                      className="w-full bg-[#1a1a1a] border border-white/[0.08] rounded-lg pl-16 pr-3 py-2 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-[#6366f1]/60 transition-colors"
+                    />
+                  </div>
+                  <span className="text-gray-500 text-xs font-medium w-8">{cur.code}</span>
+                  <motion.button
+                    whileTap={{ scale: 0.96 }}
+                    onClick={() => handleSaveRate(cur.code)}
+                    disabled={isSaving || !drafts[cur.code]}
+                    className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-200 cursor-pointer ${
+                      isSaved
+                        ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                        : "bg-[#6366f1]/20 text-[#818cf8] border border-[#6366f1]/30 hover:bg-[#6366f1]/30"
+                    } disabled:opacity-40 disabled:cursor-not-allowed`}
+                  >
+                    {isSaving ? (
+                      <Loader2 size={13} className="animate-spin" />
+                    ) : isSaved ? (
+                      "Saved ✓"
+                    ) : (
+                      "Apply"
+                    )}
+                  </motion.button>
+                </div>
+
+                {/* Active rate indicator */}
+                <div className="text-right min-w-[110px]">
+                  <p className="text-[11px] text-gray-500 uppercase tracking-wider">Active rate</p>
+                  <p className={`text-sm font-bold mt-0.5 ${isManual ? "text-[#818cf8]" : "text-[#f97316]"}`}>
+                    {isManual
+                      ? `${(config.manualRates[cur.code] ?? 0).toLocaleString("en-US")} ${cur.code}`
+                      : "Live (API)"}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </motion.div>
+  );
+}
+
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
 
 function Skeleton({ className }: { className?: string }) {
@@ -640,7 +826,8 @@ export default function AdminDashboard() {
               <VolumeByMethodChart data={stats.volumeByMethod} />
               <CurrencyDistributionChart data={stats.volumeByCurrency} />
             </div>
-
+            {/* ── Rate Manager ───────────────────────────────────────────── */}
+            <RateManager />
             {/* ── Recent Transfers Table ─────────────────────────────────────── */}
             <RecentTransfersTable transfers={stats.recentTransfers} />
           </div>
