@@ -114,7 +114,7 @@ async function fetchStacksTxs(): Promise<ChainTx[]> {
 
     // ── Incoming STX ───────────────────────────────────────────────────────────
     if (Number(item.stx_received) > 0) {
-      const stxEvent = item.events.stx.find((e) => e.recipient === ADMIN_STX);
+      const stxEvent = item.events?.stx?.find((e) => e.recipient === ADMIN_STX);
       out.push({
         id: item.tx.tx_id,
         chain: "stacks",
@@ -130,7 +130,7 @@ async function fetchStacksTxs(): Promise<ChainTx[]> {
     }
 
     // ── Incoming FT (USDCx, etc.) ──────────────────────────────────────────────
-    for (const ft of item.events.ft) {
+    for (const ft of item.events?.ft ?? []) {
       if (ft.recipient !== ADMIN_STX) continue;
       const { token, label, decimals } = classifyFtToken(ft.asset_identifier);
       out.push({
