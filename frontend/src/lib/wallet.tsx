@@ -48,15 +48,19 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
   // Rehydrate from localStorage on mount
   useEffect(() => {
-    if (isConnected()) {
-      const data = getLocalStorage();
-      if (data?.addresses) {
-        setConnected(true);
-        setAddresses({
-          stx: data.addresses.stx?.[0]?.address ?? "",
-          btc: data.addresses.btc?.[0]?.address ?? "",
-        });
+    try {
+      if (isConnected()) {
+        const data = getLocalStorage();
+        if (data?.addresses) {
+          setConnected(true);
+          setAddresses({
+            stx: data.addresses.stx?.[0]?.address ?? "",
+            btc: data.addresses.btc?.[0]?.address ?? "",
+          });
+        }
       }
+    } catch {
+      // @stacks/connect unavailable or localStorage restricted — stay disconnected
     }
   }, []);
 
