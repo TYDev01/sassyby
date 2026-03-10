@@ -785,7 +785,7 @@ export default function AdminDashboard() {
       setStats(data);
       setLastUpdated(new Date());
     } catch {
-      setError("Unable to connect to the backend. Make sure the server is running on port 4000.");
+      setError("Unable to connect to the backend. Check that the server is running and NEXT_PUBLIC_API_URL is set correctly.");
     } finally {
       setLoading(false);
       setRefreshing(false);
