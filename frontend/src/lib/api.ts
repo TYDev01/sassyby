@@ -36,7 +36,7 @@ export interface AdminStats {
 
 // ─── API base URL ────────────────────────────────────────────────────────────
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+const BASE_URL = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000").replace(/\/$/, "");
 
 // ─── API helpers ─────────────────────────────────────────────────────────────
 
