@@ -26,7 +26,7 @@ function HeroHeading() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.55, ease: "easeOut" }}
-      className="text-center mb-10"
+      className="text-center mb-5"
     >
       <h1 className="text-3xl sm:text-5xl font-bold text-white leading-tight tracking-tight">
         Bridge between{" "}
@@ -76,7 +76,7 @@ function HeroHeading() {
 
 function ArrowDivider() {
   return (
-    <div className="flex justify-center py-4 relative z-10">
+    <div className="flex justify-center py-2 relative z-10">
       <motion.div
         animate={{ y: [0, 6, 0] }}
         transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
@@ -277,7 +277,7 @@ export default function TransferPage() {
   // ── Render ───────────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] flex flex-col">
+    <div className="min-h-screen sm:h-screen sm:overflow-hidden bg-[#0a0a0a] flex flex-col">
       {/* Transfer confirmation modal */}
       <TransferModal
         open={showModal}
@@ -294,7 +294,7 @@ export default function TransferPage() {
       <Navbar />
 
       {/* Main content */}
-      <main className="flex-1 flex flex-col items-center px-3 sm:px-4 pt-28 sm:pt-36 pb-24">
+      <main className="flex-1 flex flex-col items-center sm:justify-center px-3 sm:px-4 pt-24 sm:pt-20 pb-24 sm:pb-2">
         {/* Hero */}
         <HeroHeading />
 
@@ -327,7 +327,7 @@ export default function TransferPage() {
           </div>
 
           {/* Spacer */}
-          <div className="h-4" />
+          <div className="h-2" />
 
           {/* Bank + account number row */}
           <BankSelector
@@ -338,14 +338,13 @@ export default function TransferPage() {
           />
 
           {/* Spacer */}
-          <div className="h-4" />
+          <div className="h-2" />
 
           {/* Quick transfer info */}
-          <div className="h-1" />
           <QuickTransferBanner />
 
           {/* Spacer */}
-          <div className="h-2" />
+          <div className="h-1" />
 
           {/* Submit */}
           <SubmitButton

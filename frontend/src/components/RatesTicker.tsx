@@ -68,7 +68,7 @@ export default function RatesTicker() {
   const doubled = [...items, ...items];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 bg-[#0f0f0f] border-t border-white/[0.07] overflow-hidden h-9 flex items-center select-none">
+    <div className="fixed bottom-3 left-1/2 -translate-x-1/2 w-[80%] z-40 bg-white/[0.05] backdrop-blur-md border border-white/10 rounded-xl overflow-hidden h-9 flex items-center select-none px-4">
       <div
         ref={trackRef}
         className="flex items-center animate-ticker whitespace-nowrap"
