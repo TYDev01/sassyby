@@ -299,7 +299,7 @@ export default function TransferModal({
                   ) : (
                     <>
                       <SendHorizonal size={16} />
-                      I&apos;ve sent — Start monitoring my deposit
+                      I&apos;ve made the deposit
                     </>
                   )}
                 </motion.button>
